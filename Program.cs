@@ -144,7 +144,7 @@ namespace MathFunctions
         }
     }
 
-    // Перевизначений метод ToString
+    // Перевизначений метод ToString для повного представлення функції
     public override string ToString()
     {
         return $"Функція: f(x) = ({A2}*x^2 + {A1}*x + {A0}) / ({B2}*x^2 + {B1}*x + {B0})";
@@ -190,8 +190,7 @@ class Program
 
         // --- Обчислення значень в точці ---
         Console.Write("Введіть точку x0 для обчислення значень функцій: ");
-        string input = Console.ReadLine();
-        if (double.TryParse(input, out double x0))
+        if (double.TryParse(Console.ReadLine(), out double x0))
         {
             // Обробляємо обчислення в блоці try-catch
             try
