@@ -162,6 +162,13 @@ class Program
 
         // --- Дробова функція ---
         Console.WriteLine("--- Дробова функція ---");
+        FractionalFunction fracFunc = new FractionalFunction();
+
+        fracFunc.SetCoefficients(3.0, -1.0, 5.0, 1.0, 0.0, -9.0); // f(x) = (3x^2 - x + 5) / (x^2 - 9)
+
+        fracFunc.SetCoefficients(3.0, -1.0, 5.0, 1.0, 0.0, -9.0); //  f(x) = (3x^2 - x + 5) / (x^2 - 9)
+
+        fracFunc.DisplayCoefficients();
         var fracFunc = new FractionalFunction();
         fracFunc.SetCoefficients(3.0, -1.0, 5.0, 1.0, 0.0, -9.0);
         Console.WriteLine(fracFunc);
