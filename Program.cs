@@ -144,7 +144,7 @@ namespace MathFunctions
         }
     }
 
-    // Перевизначений метод ToString для повного представлення функції
+    // Перевизначаємо ToString() для відображення повної інформації.
     public override string ToString()
     {
         return $"Функція: f(x) = ({A2}*x^2 + {A1}*x + {A0}) / ({B2}*x^2 + {B1}*x + {B0})";
@@ -152,9 +152,9 @@ namespace MathFunctions
 }
 
 // Головний клас програми
-class Program
+public class Program
 {
-    static void Main(string[] args)
+    public static void Main(string[] args)
     {
         // Використовуємо класи з нашого простору імен.
         using MathFunctions;
@@ -166,7 +166,7 @@ class Program
         Console.WriteLine(linearFunc); // Використовуємо ToString()
         Console.WriteLine();
 
-        // --- Дробова функція ---
+        // --- Створення та робота з об'єктом "дробова функція" ---
         Console.WriteLine("--- Дробова функція ---");
 
         FractionalFunction fracFunc = new FractionalFunction();
@@ -190,7 +190,8 @@ class Program
 
         // --- Обчислення значень в точці ---
         Console.Write("Введіть точку x0 для обчислення значень функцій: ");
-        if (double.TryParse(Console.ReadLine(), out double x0))
+        string input = Console.ReadLine();
+        if (double.TryParse(input, out double x0))
         {
             // Обробляємо обчислення в блоці try-catch
             try
