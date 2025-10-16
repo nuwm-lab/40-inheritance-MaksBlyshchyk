@@ -1,203 +1,140 @@
 ﻿using System;
-using System.Globalization;
 
-namespace FractionalFunctionsApp
+// Базовий клас для дробово-лінійної функції
+// f(x) = (a1*x + a0) / (b1*x + b0)
+public class FractionalLinearFunction
 {
-    /// <summary>
-    /// Представляє дробово-лінійну функцію виду (A1*x + A0) / (B1*x + B0).
-    /// </summary>
-    public class FractionalLinearFunction
+    // Коефіцієнти доступні для наслідування
+    protected double a1, a0;
+    protected double b1, b0;
+
+    // Конструктор
+    public FractionalLinearFunction()
     {
-        protected double A1 { get; set; }
-        protected double A0 { get; set; }
-        protected double B1 { get; set; }
-        protected double B0 { get; set; }
-
-        protected const double Epsilon = 1e-12;
-
-        /// <summary>
-        /// Ініціалізує новий екземпляр класу FractionalLinearFunction.
-        /// </summary>
-        public FractionalLinearFunction(double a1, double a0, double b1, double b0)
-        {
-            SetCoefficients(a1, a0, b1, b0);
-        }
-
-        /// <summary>
-        /// Задає коефіцієнти функції.
-        /// </summary>
-        public virtual void SetCoefficients(double a1, double a0, double b1, double b0)
-        {
-            if (Math.Abs(b1) < Epsilon && Math.Abs(b0) < Epsilon)
-                throw new ArgumentException("Знаменник не може бути тотожно нульовим.");
-
-            A1 = a1;
-            A0 = a0;
-            B1 = b1;
-            B0 = b0;
-        }
-
-        /// <summary>
-        /// Обчислює значення функції при заданому x.
-        /// </summary>
-        public virtual double CalculateValue(double x)
-        {
-            double denominator = B1 * x + B0;
-            if (Math.Abs(denominator) < Epsilon)
-                return double.NaN;
-
-            return (A1 * x + A0) / denominator;
-        }
-
-        /// <summary>
-        /// Виводить коефіцієнти функції.
-        /// </summary>
-        public virtual void PrintCoefficients()
-        {
-            Console.WriteLine($"A1={A1.ToString(CultureInfo.InvariantCulture)}, " +
-                              $"A0={A0.ToString(CultureInfo.InvariantCulture)}, " +
-                              $"B1={B1.ToString(CultureInfo.InvariantCulture)}, " +
-                              $"B0={B0.ToString(CultureInfo.InvariantCulture)}");
-        }
-
-        protected static string FormatSign(double value)
-        {
-            return value >= 0 ? $"+ {value.ToString(CultureInfo.InvariantCulture)}" :
-                                $"- {Math.Abs(value).ToString(CultureInfo.InvariantCulture)}";
-        }
-
-        public override string ToString()
-        {
-            return $"f(x) = ({A1.ToString(CultureInfo.InvariantCulture)}x {FormatSign(A0)}) / " +
-                   $"({B1.ToString(CultureInfo.InvariantCulture)}x {FormatSign(B0)})";
-        }
+        a1 = 0; a0 = 0;
+        b1 = 0; b0 = 0;
     }
 
-    /// <summary>
-    ///  Представляє квадратичну дробову функцію виду (A2*x² + A1*x + A0) / (B2*x² + B1*x + B0).
-    /// </summary>
-    public class FractionalFunction : FractionalLinearFunction
+    // Метод для задання коефіцієнтів
+    public virtual void SetCoefficients(double a1_val, double a0_val, double b1_val, double b0_val)
     {
-        protected double A2 { get; set; }
-        protected double B2 { get; set; }
-
-        public FractionalFunction(double a2, double a1, double a0, double b2, double b1, double b0)
-            : base(a1, a0, b1, b0)
-        {
-            SetCoefficients(a2, a1, a0, b2, b1, b0);
-        }
-
-        /// <summary>
-        /// Задає коефіцієнти квадратичної дробової функції.
-        /// </summary>
-        public void SetCoefficients(double a2, double a1, double a0, double b2, double b1, double b0)
-        {
-            if (Math.Abs(b2) < Epsilon && Math.Abs(b1) < Epsilon && Math.Abs(b0) < Epsilon)
-                throw new ArgumentException("Знаменник не може бути тотожно нульовим.");
-
-            A2 = a2;
-            B2 = b2;
-            base.SetCoefficients(a1, a0, b1, b0);
-        }
-
-        /// <summary>
-        /// Обчислює значення квадратичної дробової функції.
-        /// </summary>
-        public override double CalculateValue(double x)
-        {
-            double denominator = B2 * x * x + B1 * x + B0;
-            if (Math.Abs(denominator) < Epsilon)
-                return double.NaN;
-
-            double numerator = A2 * x * x + A1 * x + A0;
-            return numerator / denominator;
-        }
-
-        /// <summary>
-        /// Виводить усі коефіцієнти функції.
-        /// </summary>
-        public override void PrintCoefficients()
-        {
-            Console.WriteLine($"A2={A2.ToString(CultureInfo.InvariantCulture)}, " +
-                              $"A1={A1.ToString(CultureInfo.InvariantCulture)}, " +
-                              $"A0={A0.ToString(CultureInfo.InvariantCulture)}, " +
-                              $"B2={B2.ToString(CultureInfo.InvariantCulture)}, " +
-                              $"B1={B1.ToString(CultureInfo.InvariantCulture)}, " +
-                              $"B0={B0.ToString(CultureInfo.InvariantCulture)}");
-        }
-
-        public override string ToString()
-        {
-            return $"f(x) = ({A2.ToString(CultureInfo.InvariantCulture)}x² {FormatSign(A1)}x {FormatSign(A0)}) / " +
-                   $"({B2.ToString(CultureInfo.InvariantCulture)}x² {FormatSign(B1)}x {FormatSign(B0)})";
-        }
+        a1 = a1_val;
+        a0 = a0_val;
+        b1 = b1_val;
+        b0 = b0_val;
     }
 
-    /// <summary>
-    /// Масштабована версія квадратичної дробової функції.
-    /// </summary>
-    public class ScaledFractionalFunction : FractionalFunction
+    // Метод для виведення коефіцієнтів на екран
+    public virtual void DisplayCoefficients()
     {
-        public double Scale { get; private set; }
-
-        public ScaledFractionalFunction(double a2, double a1, double a0, double b2, double b1, double b0, double scale)
-            : base(a2, a1, a0, b2, b1, b0)
-        {
-            Scale = scale;
-        }
-
-        public override double CalculateValue(double x)
-        {
-            double baseValue = base.CalculateValue(x);
-            return double.IsNaN(baseValue) ? double.NaN : baseValue * Scale;
-        }
-
-        public override string ToString()
-        {
-            return $"{base.ToString()}, масштаб: {Scale.ToString(CultureInfo.InvariantCulture)}";
-        }
+        Console.WriteLine("Функція: (a1*x + a0) / (b1*x + b0)");
+        Console.WriteLine($"Коефіцієнти чисельника: a1 = {a1}, a0 = {a0}");
+        Console.WriteLine($"Коефіцієнти знаменника: b1 = {b1}, b0 = {b0}");
     }
 
-    class Program
+    // Метод для знаходження значення в заданій точці
+    public virtual double CalculateValue(double x)
     {
-        static void Main()
+        double denominator = b1 * x + b0;
+        if (Math.Abs(denominator) < 1e-9) // Перевірка на ділення на нуль
         {
-            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            Console.Error.WriteLine($"Помилка: Ділення на нуль! Знаменник дорівнює нулю в точці x = {x}");
+            return double.NaN; // Повертаємо "не число"
+        }
+        return (a1 * x + a0) / denominator;
+    }
+}
 
-            Console.WriteLine("Введіть значення x (використовуйте крапку як десятковий роздільник, наприклад 1.25):");
-            string input = Console.ReadLine();
+// Похідний клас для дробової функції
+// f(x) = (a2*x^2 + a1*x + a0) / (b2*x^2 + b1*x + b0)
+public class FractionalFunction : FractionalLinearFunction
+{
+    private double a2;
+    private double b2;
 
-            if (!double.TryParse(input, NumberStyles.Float, CultureInfo.InvariantCulture, out double x))
+    // Конструктор
+    public FractionalFunction() : base() // Виклик конструктора базового класу
+    {
+        a2 = 0;
+        b2 = 0;
+    }
+
+    // Новий метод для задання всіх коефіцієнтів
+    public void SetCoefficients(double a2_val, double a1_val, double a0_val, double b2_val, double b1_val, double b0_val)
+    {
+        // Встановлюємо спільні коефіцієнти через метод базового класу
+        base.SetCoefficients(a1_val, a0_val, b1_val, b0_val);
+        // Встановлюємо нові коефіцієнти
+        a2 = a2_val;
+        b2 = b2_val;
+    }
+
+    // Перевизначений метод для виведення коефіцієнтів
+    public override void DisplayCoefficients()
+    {
+        Console.WriteLine("Функція: (a2*x^2 + a1*x + a0) / (b2*x^2 + b1*x + b0)");
+        Console.WriteLine($"Коефіцієнти чисельника: a2 = {a2}, a1 = {a1}, a0 = {a0}");
+        Console.WriteLine($"Коефіцієнти знаменника: b2 = {b2}, b1 = {b1}, b0 = {b0}");
+    }
+
+    // Перевизначений метод для знаходження значення в точці
+    public override double CalculateValue(double x)
+    {
+        double numerator = a2 * x * x + a1 * x + a0;
+        double denominator = b2 * x * x + b1 * x + b0;
+
+        if (Math.Abs(denominator) < 1e-9) // Перевірка на ділення на нуль
+        {
+            Console.Error.WriteLine($"Помилка: Ділення на нуль! Знаменник дорівнює нулю в точці x = {x}");
+            return double.NaN;
+        }
+        return numerator / denominator;
+    }
+}
+
+// Головний клас програми
+class Program
+{
+    static void Main(string[] args)
+    {
+        // --- Створення та робота з об'єктом "дробово-лінійна функція" ---
+        Console.WriteLine("--- Дробово-лінійна функція ---");
+        FractionalLinearFunction linearFunc = new FractionalLinearFunction();
+        linearFunc.SetCoefficients(2.0, -4.0, 1.0, 2.0); // f(x) = (2x - 4) / (x + 2)
+        linearFunc.DisplayCoefficients();
+        Console.WriteLine();
+
+        // --- Створення та робота з об'єктом "дробова функція" ---
+        Console.WriteLine("--- Дробова функція ---");
+        FractionalFunction fracFunc = new FractionalFunction();
+        fracFunc.SetCoefficients(3.0, -1.0, 5.0, 1.0, 0.0, -9.0); // f(x) = (3x^2 - x + 5) / (x^2 - 9)
+        fracFunc.DisplayCoefficients();
+        Console.WriteLine();
+
+        // --- Обчислення значень в точці ---
+        Console.Write("Введіть точку x0 для обчислення значень функцій: ");
+        string input = Console.ReadLine();
+        if (double.TryParse(input, out double x0))
+        {
+            // Обчислення для першої функції
+            Console.WriteLine($"\nЗначення дробово-лінійної функції в точці {x0}:");
+            double result1 = linearFunc.CalculateValue(x0);
+            if (!double.IsNaN(result1))
             {
-                Console.WriteLine("Некоректне введення. Використовуйте формат із крапкою (наприклад: 2.5)");
-                return;
+                Console.WriteLine($"f({x0}) = {result1}");
             }
 
-            try
+            // Обчислення для другої функції
+            Console.WriteLine($"\nЗначення дробової функції в точці {x0}:");
+            double result2 = fracFunc.CalculateValue(x0);
+            if (!double.IsNaN(result2))
             {
-                var f1 = new FractionalLinearFunction(2, 1, 1, 3);
-                var f2 = new FractionalFunction(1, -2, 3, 2, -1, 1);
-                var f3 = new ScaledFractionalFunction(1, 2, 1, 1, -1, 1, 2);
-
-                Console.WriteLine("\n--- Коефіцієнти ---");
-                f1.PrintCoefficients();
-                f2.PrintCoefficients();
-                f3.PrintCoefficients();
-
-                Console.WriteLine("\n--- Формули ---");
-                Console.WriteLine(f1);
-                Console.WriteLine(f2);
-                Console.WriteLine(f3);
-
-                Console.WriteLine("\n--- Результати ---");
-                Console.WriteLine($"f1({x}) = {f1.CalculateValue(x).ToString(CultureInfo.InvariantCulture)}");
-                Console.WriteLine($"f2({x}) = {f2.CalculateValue(x).ToString(CultureInfo.InvariantCulture)}");
-                Console.WriteLine($"f3({x}) = {f3.CalculateValue(x).ToString(CultureInfo.InvariantCulture)}");
+                Console.WriteLine($"f({x0}) = {result2}");
             }
-            catch (ArgumentException ex)
-            {
-                Console.WriteLine($"Помилка: {ex.Message}");
-            }
+        }
+        else
+        {
+            Console.WriteLine("Некоректне введення. Будь ласка, введіть число.");
         }
     }
 }
