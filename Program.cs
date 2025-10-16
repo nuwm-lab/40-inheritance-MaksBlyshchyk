@@ -36,7 +36,7 @@ public class FractionalLinearFunction
     public virtual double CalculateValue(double x)
     {
         double denominator = b1 * x + b0;
-        if (Math.Abs(denominator) < 1e-9) //  Перевірка на ділення на нуль
+        if (Math.Abs(denominator) < 1e-9) // Перевірка на ділення на нуль
         {
             Console.Error.WriteLine($"Помилка: Ділення на нуль! Знаменник дорівнює нулю в точці x = {x}");
             return double.NaN; // Повертаємо "не число"
