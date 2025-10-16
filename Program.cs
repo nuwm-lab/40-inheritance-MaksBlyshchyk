@@ -1,134 +1,210 @@
 ﻿using System;
 
-// Базовий клас для дробово-лінійної функції
-// f(x) = (A1*x + A0) / (B1*x + B0)
-public class FractionalLinearFunction
+namespace MathFunctions
 {
-    // Використовуємо властивості з приватними полями для кращої інкапсуляції.
-    // Доступ protected дозволяє похідним класам їх змінювати.
-    public double A1 { get; protected set; }
-    public double A0 { get; protected set; }
-    public double B1 { get; protected set; }
-    public double B0 { get; protected set; }
-
-    // Створюємо константу для перевірки на нуль, щоб уникнути "магічних чисел".
-    protected const double Epsilon = 1e-9;
-
-    // Конструктор для ініціалізації коефіцієнтів при створенні об'єкта.
-    // Це кращий підхід, ніж окремий метод SetCoefficients.
-    public FractionalLinearFunction(double a1, double a0, double b1, double b0)
+    /// <summary>
+    /// Базовий клас для дробово-лінійної функції.
+    /// Представляє функцію вигляду: f(x) = (A1*x + A0) / (B1*x + B0).
+    /// </summary>
+    public class FractionalLinearFunction
     {
-        A1 = a1;
-        A0 = a0;
-        B1 = b1;
-        B0 = b0;
-    }
+        // Властивості з автоматичною реалізацією. 'protected set' дозволяє
+        // змінювати їх у похідних класах, але не ззовні.
+        public double A1 { get; protected set; }
+        public double A0 { get; protected set; }
+        public double B1 { get; protected set; }
+        public double B0 { get; protected set; }
 
-    // Метод для знаходження значення в заданій точці.
-    public virtual double CalculateValue(double x)
-    {
-        double denominator = B1 * x + B0;
-        // Перевірка на ділення на нуль з використанням константи Epsilon.
-        if (Math.Abs(denominator) < Epsilon)
+        /// <summary>
+        /// Мала величина для порівняння з нулем, щоб уникнути помилок з плаваючою комою.
+        /// </summary>
+        protected const double Epsilon = 1e-9;
+
+        /// <summary>
+        /// Ініціалізує новий екземпляр класу з заданими коефіцієнтами.
+        /// </summary>
+        /// <param name="a1">Коефіцієнт 'a1' у чисельнику.</param>
+        /// <param name="a0">Коефіцієнт 'a0' у чисельнику.</param>
+        /// <param name="b1">Коефіцієнт 'b1' у знаменнику.</param>
+        /// <param name="b0">Коефіцієнт 'b0' у знаменнику.</param>
+        public FractionalLinearFunction(double a1, double a0, double b1, double b0)
         {
-            Console.Error.WriteLine($"Помилка: Ділення на нуль! Знаменник дорівнює нулю в точці x = {x}");
-            return double.NaN; // Повертаємо "не число"
+            A1 = a1;
+            A0 = a0;
+            B1 = b1;
+            B0 = b0;
         }
-        return (A1 * x + A0) / denominator;
-    }
 
-    // Перевизначаємо метод ToString() для зручного виведення інформації про об'єкт.
-    // Це більш ідіоматичний підхід у C#, ніж кастомний метод DisplayCoefficients().
-    public override string ToString()
-    {
-        return $"Функція: f(x) = ({A1}*x + {A0}) / ({B1}*x + {B0})";
-    }
-}
-
-// Похідний клас для дробової функції
-// f(x) = (A2*x^2 + A1*x + A0) / (B2*x^2 + B1*x + B0)
-public class FractionalFunction : FractionalLinearFunction
-{
-    // Додаємо нову властивість, специфічну для цього класу.
-    public double A2 { get; protected set; }
-    public double B2 { get; protected set; }
-
-    // Конструктор похідного класу, що викликає конструктор базового класу.
-    public FractionalFunction(double a2, double a1, double a0, double b2, double b1, double b0)
-        : base(a1, a0, b1, b0) // Передаємо коефіцієнти до базового класу
-    {
-        // Ініціалізуємо власні коефіцієнти.
-        A2 = a2;
-        B2 = b2;
-    }
-
-    // Перевизначений метод для знаходження значення в точці.
-    public override double CalculateValue(double x)
-    {
-        double numerator = A2 * x * x + A1 * x + A0;
-        double denominator = B2 * x * x + B1 * x + B0;
-
-        // Використовуємо Epsilon, успадкований від базового класу.
-        if (Math.Abs(denominator) < Epsilon)
+        /// <summary>
+        /// Обчислює значення функції в заданій точці x.
+        /// </summary>
+        /// <param name="x">Точка, в якій обчислюється значення.</param>
+        /// <returns>Результат обчислення або double.NaN, якщо знаменник дорівнює нулю.</returns>
+        public virtual double CalculateValue(double x)
         {
-            Console.Error.WriteLine($"Помилка: Ділення на нуль! Знаменник дорівнює нулю в точці x = {x}");
-            return double.NaN;
-        }
-        return numerator / denominator;
-    }
-
-    // Перевизначаємо ToString() для відображення повної інформації.
-    public override string ToString()
-    {
-        return $"Функція: f(x) = ({A2}*x^2 + {A1}*x + {A0}) / ({B2}*x^2 + {B1}*x + {B0})";
-    }
-}
-
-// Головний клас програми
-public class Program
-{
-    public static void Main(string[] args)
-    {
-        // --- Створення та робота з об'єктом "дробово-лінійна функція" ---
-        Console.WriteLine("--- Дробово-лінійна функція ---");
-        // Ініціалізація через конструктор
-        FractionalLinearFunction linearFunc = new FractionalLinearFunction(2.0, -4.0, 1.0, 2.0);
-        // Неявно викликається linearFunc.ToString()
-        Console.WriteLine(linearFunc);
-        Console.WriteLine();
-
-        // --- Створення та робота з об'єктом "дробова функція" ---
-        Console.WriteLine("--- Дробова функція ---");
-        // Ініціалізація через конструктор, без дублювання змінних
-        FractionalFunction fracFunc = new FractionalFunction(3.0, -1.0, 5.0, 1.0, 0.0, -9.0);
-        // Неявно викликається fracFunc.ToString()
-        Console.WriteLine(fracFunc);
-        Console.WriteLine();
-
-        // --- Обчислення значень в точці ---
-        Console.Write("Введіть точку x0 для обчислення значень функцій: ");
-        string input = Console.ReadLine();
-        if (double.TryParse(input, out double x0))
-        {
-            // Обчислення для першої функції
-            Console.WriteLine($"\nЗначення дробово-лінійної функції в точці {x0}:");
-            double result1 = linearFunc.CalculateValue(x0);
-            if (!double.IsNaN(result1))
+            double denominator = B1 * x + B0;
+            if (Math.Abs(denominator) < Epsilon)
             {
-                Console.WriteLine($"f({x0}) = {result1:F4}"); // Форматуємо вивід до 4 знаків
+                Console.Error.WriteLine($"Помилка (лінійна функція): Ділення на нуль в точці x = {x}");
+                return double.NaN;
+            }
+            return (A1 * x + A0) / denominator;
+        }
+
+        /// <summary>
+        /// Повертає рядкове представлення функції.
+        /// </summary>
+        /// <returns>Рядок, що описує функцію та її коефіцієнти.</returns>
+        public override string ToString()
+        {
+            return $"f(x) = ({A1}*x + {A0}) / ({B1}*x + {B0})";
+        }
+    }
+
+    /// <summary>
+    /// Похідний клас для дробової функції з квадратичними поліномами.
+    /// Представляє функцію вигляду: f(x) = (A2*x^2 + A1*x + A0) / (B2*x^2 + B1*x + B0).
+    /// </summary>
+    public class FractionalFunction : FractionalLinearFunction
+    {
+        public double A2 { get; protected set; }
+        public double B2 { get; protected set; }
+
+        /// <summary>
+        /// Ініціалізує новий екземпляр класу з заданими коефіцієнтами.
+        /// </summary>
+        public FractionalFunction(double a2, double a1, double a0, double b2, double b1, double b0)
+            : base(a1, a0, b1, b0) // Виклик конструктора базового класу
+        {
+            A2 = a2;
+            B2 = b2;
+        }
+
+        /// <summary>
+        /// Перевизначений метод для обчислення значення квадратичної дробової функції.
+        /// </summary>
+        public override double CalculateValue(double x)
+        {
+            double numerator = A2 * x * x + A1 * x + A0;
+            double denominator = B2 * x * x + B1 * x + B0;
+
+            // Використовуємо константу Epsilon з базового класу
+            if (Math.Abs(denominator) < Epsilon)
+            {
+                Console.Error.WriteLine($"Помилка (квадратична функція): Ділення на нуль в точці x = {x}");
+                return double.NaN;
+            }
+            return numerator / denominator;
+        }
+
+        /// <summary>
+        /// Повертає рядкове представлення квадратичної дробової функції.
+        /// </summary>
+        public override string ToString()
+        {
+            return $"f(x) = ({A2}*x^2 + {A1}*x + {A0}) / ({B2}*x^2 + {B1}*x + {B0})";
+        }
+    }
+
+    /// <summary>
+    /// Похідний клас, що масштабує результат базової дробово-лінійної функції.
+    /// Представляє функцію вигляду: f(x) = ScaleFactor * (A1*x + A0) / (B1*x + B0).
+    /// </summary>
+    public class ScaledFractionalFunction : FractionalLinearFunction
+    {
+        public double ScaleFactor { get; protected set; }
+
+        /// <summary>
+        /// Ініціалізує новий екземпляр масштабованої функції.
+        /// </summary>
+        public ScaledFractionalFunction(double a1, double a0, double b1, double b0, double scaleFactor)
+            : base(a1, a0, b1, b0)
+        {
+            ScaleFactor = scaleFactor;
+        }
+
+        /// <summary>
+        /// Перевизначений метод, що обчислює значення базової функції і множить його на коефіцієнт.
+        /// </summary>
+        public override double CalculateValue(double x)
+        {
+            // Викликаємо реалізацію базового класу, щоб уникнути дублювання коду
+            double baseValue = base.CalculateValue(x);
+
+            // Перевіряємо, чи не повернув базовий метод помилку
+            if (double.IsNaN(baseValue))
+            {
+                return double.NaN;
             }
 
-            // Обчислення для другої функції
-            Console.WriteLine($"\nЗначення дробової функції в точці {x0}:");
-            double result2 = fracFunc.CalculateValue(x0);
-            if (!double.IsNaN(result2))
-            {
-                Console.WriteLine($"f({x0}) = {result2:F4}"); // Форматуємо вивід до 4 знаків
-            }
+            return baseValue * ScaleFactor;
         }
-        else
+
+        /// <summary>
+        /// Повертає рядкове представлення масштабованої функції.
+        /// </summary>
+        public override string ToString()
         {
-            Console.WriteLine("Некоректне введення. Будь ласка, введіть число.");
+            return $"f(x) = {ScaleFactor} * [({A1}*x + {A0}) / ({B1}*x + {B0})]";
         }
     }
-}
+
+    /// <summary>
+    /// Головний клас програми для демонстрації роботи з функціями.
+    /// </summary>
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            Console.WriteLine("--- Демонстрація роботи з ієрархією класів функцій ---");
+
+            // Створення об'єктів через конструктори
+            var linearFunc = new FractionalLinearFunction(2.0, -4.0, 1.0, 2.0);
+            var fracFunc = new FractionalFunction(3.0, -1.0, 5.0, 1.0, 0.0, -9.0);
+            var scaledFunc = new ScaledFractionalFunction(1.0, 1.0, 1.0, -5.0, 10.0);
+
+            // Виведення інформації про функції (неявно викликається метод ToString)
+            Console.WriteLine("\n1. Дробово-лінійна функція:");
+            Console.WriteLine(linearFunc);
+
+            Console.WriteLine("\n2. Дробова квадратична функція:");
+            Console.WriteLine(fracFunc);
+
+            Console.WriteLine("\n3. Масштабована дробово-лінійна функція:");
+            Console.WriteLine(scaledFunc);
+
+            // --- Обчислення значень в точці ---
+            Console.Write("\nВведіть точку x для обчислення значень функцій: ");
+            string input = Console.ReadLine();
+            if (double.TryParse(input, out double x0))
+            {
+                Console.WriteLine("---------------------------------------------");
+
+                // Обчислення для першої функції
+                double result1 = linearFunc.CalculateValue(x0);
+                if (!double.IsNaN(result1))
+                {
+                    Console.WriteLine($"Значення лінійної функції в точці {x0}: {result1:F4}");
+                }
+
+                // Обчислення для другої функції
+                double result2 = fracFunc.CalculateValue(x0);
+                if (!double.IsNaN(result2))
+                {
+                    Console.WriteLine($"Значення квадратичної функції в точці {x0}: {result2:F4}");
+                }
+
+                // Обчислення для третьої функції
+                double result3 = scaledFunc.CalculateValue(x0);
+                if (!double.IsNaN(result3))
+                {
+                    Console.WriteLine($"Значення масштабованої функції в точці {x0}: {result3:F4}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Некоректне введення. Було введено не число.");
+            }
+        }
+    }
+}]
