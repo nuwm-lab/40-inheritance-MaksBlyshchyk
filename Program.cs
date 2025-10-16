@@ -144,18 +144,17 @@ namespace MathFunctions
         }
     }
 
+    // Перевизначений метод ToString
+    public override string ToString()
+    {
+        return $"Функція: f(x) = ({A2}*x^2 + {A1}*x + {A0}) / ({B2}*x^2 + {B1}*x + {B0})";
+    }
 }
 
-
-
 // Головний клас програми
-
 class Program
-
 {
-
     static void Main(string[] args)
-
     {
         // Використовуємо класи з нашого простору імен.
         using MathFunctions;
@@ -189,16 +188,10 @@ class Program
         Console.WriteLine(scaledFunc);
         Console.WriteLine();
 
-
-
         // --- Обчислення значень в точці ---
-
         Console.Write("Введіть точку x0 для обчислення значень функцій: ");
-
         string input = Console.ReadLine();
-
         if (double.TryParse(input, out double x0))
-
         {
             // Обробляємо обчислення в блоці try-catch
             try
@@ -236,15 +229,9 @@ class Program
                 Console.WriteLine(ex.Message);
             }
         }
-
         else
-
         {
-
             Console.WriteLine("Некоректне введення. Будь ласка, введіть число.");
-
         }
-
     }
-
 }
