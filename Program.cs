@@ -148,7 +148,7 @@ namespace MathFunctions
             }
             else
             {
-                Console.WriteLine("Некоректне введення — потрібно ввести число.");
+                 Console.WriteLine("Некоректне введення — потрібно ввести число.");
             }
         }
     }
