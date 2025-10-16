@@ -144,17 +144,53 @@ namespace MathFunctions
         }
     }
 
-    // Перевизначаємо ToString() для відображення повної інформації.
-    public override string ToString()
+    /// <summary>
+    /// Похідний клас, що масштабує результат базової дробово-лінійної функції.
+    /// Представляє функцію вигляду: f(x) = ScaleFactor * (A1*x + A0) / (B1*x + B0).
+    /// </summary>
+    public class ScaledFractionalFunction : FractionalLinearFunction
     {
-        return $"Функція: f(x) = ({A2}*x^2 + {A1}*x + {A0}) / ({B2}*x^2 + {B1}*x + {B0})";
-    }
-}
+        public double ScaleFactor { get; protected set; }
 
-// Головний клас програми
-public class Program
-{
-    public static void Main(string[] args)
+        /// <summary>
+        /// Ініціалізує новий екземпляр масштабованої функції.
+        /// </summary>
+        public ScaledFractionalFunction(double a1, double a0, double b1, double b0, double scaleFactor)
+            : base(a1, a0, b1, b0)
+        {
+            ScaleFactor = scaleFactor;
+        }
+
+        /// <summary>
+        /// Перевизначений метод, що обчислює значення базової функції і множить його на коефіцієнт.
+        /// </summary>
+        public override double CalculateValue(double x)
+        {
+            // Викликаємо реалізацію базового класу, щоб уникнути дублювання коду
+            double baseValue = base.CalculateValue(x);
+
+            // Перевіряємо, чи не повернув базовий метод помилку
+            if (double.IsNaN(baseValue))
+            {
+                return double.NaN;
+            }
+
+            return baseValue * ScaleFactor;
+        }
+
+        /// <summary>
+        /// Повертає рядкове представлення масштабованої функції.
+        /// </summary>
+        public override string ToString()
+        {
+            return $"f(x) = {ScaleFactor} * [({A1}*x + {A0}) / ({B1}*x + {B0})]";
+        }
+    }
+
+    /// <summary>
+    /// Головний клас програми для демонстрації роботи з функціями.
+    /// </summary>
+    public class Program
     {
         // Використовуємо класи з нашого простору імен.
         using MathFunctions;
@@ -229,9 +265,5 @@ public class Program
                 Console.WriteLine(ex.Message);
             }
         }
-        else
-        {
-            Console.WriteLine("Некоректне введення. Будь ласка, введіть число.");
-        }
     }
-}
+}]
