@@ -74,7 +74,7 @@ namespace FractionalFunctionsApp
     }
 
     /// <summary>
-    /// Представляє квадратичну дробову функцію виду (A2*x² + A1*x + A0) / (B2*x² + B1*x + B0).
+    ///  Представляє квадратичну дробову функцію виду (A2*x² + A1*x + A0) / (B2*x² + B1*x + B0).
     /// </summary>
     public class FractionalFunction : FractionalLinearFunction
     {
