@@ -143,12 +143,19 @@ namespace MathFunctions
             return $"Масштабована функція: f(x) = {Scale} * [({A1}x + {A0}) / ({B1}x + {B0})]";
         }
     }
+
 }
 
+
+
 // Головний клас програми
+
 class Program
+
 {
+
     static void Main(string[] args)
+
     {
         // Використовуємо класи з нашого простору імен.
         using MathFunctions;
@@ -162,6 +169,7 @@ class Program
 
         // --- Дробова функція ---
         Console.WriteLine("--- Дробова функція ---");
+
         FractionalFunction fracFunc = new FractionalFunction();
 
         fracFunc.SetCoefficients(3.0, -1.0, 5.0, 1.0, 0.0, -9.0); // f(x) = (3x^2 - x + 5) / (x^2 - 9)
@@ -181,10 +189,16 @@ class Program
         Console.WriteLine(scaledFunc);
         Console.WriteLine();
 
+
+
         // --- Обчислення значень в точці ---
+
         Console.Write("Введіть точку x0 для обчислення значень функцій: ");
+
         string input = Console.ReadLine();
+
         if (double.TryParse(input, out double x0))
+
         {
             // Обробляємо обчислення в блоці try-catch
             try
@@ -192,6 +206,7 @@ class Program
                 Console.WriteLine($"\nЗначення дробово-лінійної функції в точці {x0}:");
                 double result1 = linearFunc.CalculateValue(x0);
                 Console.WriteLine($"f({x0}) = {result1}");
+
             }
             catch (DivideByZeroException ex)
             {
@@ -203,6 +218,7 @@ class Program
                 Console.WriteLine($"\nЗначення дробової функції в точці {x0}:");
                 double result2 = fracFunc.CalculateValue(x0);
                 Console.WriteLine($"f({x0}) = {result2}");
+
             }
             catch (DivideByZeroException ex)
             {
@@ -220,9 +236,15 @@ class Program
                 Console.WriteLine(ex.Message);
             }
         }
+
         else
+
         {
+
             Console.WriteLine("Некоректне введення. Будь ласка, введіть число.");
+
         }
+
     }
+
 }
