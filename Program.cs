@@ -1,140 +1,177 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
-// Базовий клас для дробово-лінійної функції
-// f(x) = (a1*x + a0) / (b1*x + b0)
-public class FractionalLinearFunction
+// Структура для точки на площині
+public readonly struct Point
 {
-    // Коефіцієнти доступні для наслідування
-    protected double a1, a0;
-    protected double b1, b0;
+    public double X { get; }
+    public double Y { get; }
 
-    // Конструктор
-    public FractionalLinearFunction()
+    public Point(double x, double y)
     {
-        a1 = 0; a0 = 0;
-        b1 = 0; b0 = 0;
+        X = x;
+        Y = y;
     }
 
-    // Метод для задання коефіцієнтів
-    public virtual void SetCoefficients(double a1_val, double a0_val, double b1_val, double b0_val)
-    {
-        a1 = a1_val;
-        a0 = a0_val;
-        b1 = b1_val;
-        b0 = b0_val;
-    }
+    public override string ToString() => $"({X}, {Y})";
+}
 
-    // Метод для виведення коефіцієнтів на екран
-    public virtual void DisplayCoefficients()
-    {
-        Console.WriteLine("Функція: (a1*x + a0) / (b1*x + b0)");
-        Console.WriteLine($"Коефіцієнти чисельника: a1 = {a1}, a0 = {a0}");
-        Console.WriteLine($"Коефіцієнти знаменника: b1 = {b1}, b0 = {b0}");
-    }
+// Клас, що представляє опуклий чотирикутник на площині
+public class ConvexQuadrilateral
+{
+    // Закриті поля для збереження вершин
+    private readonly Point[] _vertices; // гарантовано довжиною 4
 
-    // Метод для знаходження значення в заданій точці
-    public virtual double CalculateValue(double x)
+    // Відкритий лише для читання доступ до вершин (інкапсуляція)
+    public IReadOnlyList<Point> Vertices => Array.AsReadOnly(_vertices);
+
+    // Конструктор приймає 4 вершини (у порядку обходу)
+    public ConvexQuadrilateral(Point v1, Point v2, Point v3, Point v4)
     {
-        double denominator = b1 * x + b0;
-        if (Math.Abs(denominator) < 1e-9) // Перевірка на ділення на нуль
+        _vertices = new[] { v1, v2, v3, v4 };
+
+        if (!IsConvex())
         {
-            Console.Error.WriteLine($"Помилка: Ділення на нуль! Знаменник дорівнює нулю в точці x = {x}");
-            return double.NaN; // Повертаємо "не число"
+            throw new ArgumentException("Передані вершини не утворюють опуклий чотирикутник.");
         }
-        return (a1 * x + a0) / denominator;
+    }
+
+    // Периметр як властивість лише для читання
+    public double Perimeter => CalculatePerimeter();
+
+    // Обчислення периметра
+    private double CalculatePerimeter()
+    {
+        double sum = 0.0;
+        for (var i = 0; i < 4; i++)
+        {
+            var a = _vertices[i];
+            var b = _vertices[(i + 1) % 4];
+            sum += Distance(a, b);
+        }
+
+        return sum;
+    }
+
+    // Статичний допоміжний метод для відстані між точками
+    private static double Distance(Point a, Point b)
+        => Math.Sqrt((a.X - b.X) * (a.X - b.X) + (a.Y - b.Y) * (a.Y - b.Y));
+
+    // Перевірка опуклості: знаки векторних добутків послідовних ребер однакові (без нульових)
+    private bool IsConvex()
+    {
+        // Перевіримо, що ніякі три суміжні точки не колінеарні і що знак зберігається
+        int sign = 0;
+        for (var i = 0; i < 4; i++)
+        {
+            var a = _vertices[i];
+            var b = _vertices[(i + 1) % 4];
+            var c = _vertices[(i + 2) % 4];
+
+            double cross = CrossProduct(a, b, c);
+            if (Math.Abs(cross) < 1e-12)
+            {
+                // колінеарні три точки -> не підходить
+                return false;
+            }
+
+            int currentSign = cross > 0 ? 1 : -1;
+            if (sign == 0)
+            {
+                sign = currentSign;
+            }
+            else if (sign != currentSign)
+            {
+                return false; // зміна знаку -> не опуклий
+            }
+        }
+
+        return true;
+    }
+
+    // Знак векторного (2D) добутку векторів AB і BC
+    private static double CrossProduct(Point a, Point b, Point c)
+    {
+        double abx = b.X - a.X;
+        double aby = b.Y - a.Y;
+        double bcx = c.X - b.X;
+        double bcy = c.Y - b.Y;
+        return abx * bcy - aby * bcx;
+    }
+
+    public override string ToString()
+    {
+        return $"Вершини: {string.Join(", ", _vertices.Select(p => p.ToString()))}; Периметр = {Perimeter:F4}";
     }
 }
 
-// Похідний клас для дробової функції
-// f(x) = (a2*x^2 + a1*x + a0) / (b2*x^2 + b1*x + b0)
-public class FractionalFunction : FractionalLinearFunction
-{
-    private double a2;
-    private double b2;
-
-    // Конструктор
-    public FractionalFunction() : base() // Виклик конструктора базового класу
-    {
-        a2 = 0;
-        b2 = 0;
-    }
-
-    // Новий метод для задання всіх коефіцієнтів
-    public void SetCoefficients(double a2_val, double a1_val, double a0_val, double b2_val, double b1_val, double b0_val)
-    {
-        // Встановлюємо спільні коефіцієнти через метод базового класу
-        base.SetCoefficients(a1_val, a0_val, b1_val, b0_val);
-        // Встановлюємо нові коефіцієнти
-        a2 = a2_val;
-        b2 = b2_val;
-    }
-
-    // Перевизначений метод для виведення коефіцієнтів
-    public override void DisplayCoefficients()
-    {
-        Console.WriteLine("Функція: (a2*x^2 + a1*x + a0) / (b2*x^2 + b1*x + b0)");
-        Console.WriteLine($"Коефіцієнти чисельника: a2 = {a2}, a1 = {a1}, a0 = {a0}");
-        Console.WriteLine($"Коефіцієнти знаменника: b2 = {b2}, b1 = {b1}, b0 = {b0}");
-    }
-
-    // Перевизначений метод для знаходження значення в точці
-    public override double CalculateValue(double x)
-    {
-        double numerator = a2 * x * x + a1 * x + a0;
-        double denominator = b2 * x * x + b1 * x + b0;
-
-        if (Math.Abs(denominator) < 1e-9) // Перевірка на ділення на нуль
-        {
-            Console.Error.WriteLine($"Помилка: Ділення на нуль! Знаменник дорівнює нулю в точці x = {x}");
-            return double.NaN;
-        }
-        return numerator / denominator;
-    }
-}
-
-// Головний клас програми
 class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        // --- Створення та робота з об'єктом "дробово-лінійна функція" ---
-        Console.WriteLine("--- Дробово-лінійна функція ---");
-        FractionalLinearFunction linearFunc = new FractionalLinearFunction();
-        linearFunc.SetCoefficients(2.0, -4.0, 1.0, 2.0); // f(x) = (2x - 4) / (x + 2)
-        linearFunc.DisplayCoefficients();
-        Console.WriteLine();
-
-        // --- Створення та робота з об'єктом "дробова функція" ---
-        Console.WriteLine("--- Дробова функція ---");
-        FractionalFunction fracFunc = new FractionalFunction();
-        fracFunc.SetCoefficients(3.0, -1.0, 5.0, 1.0, 0.0, -9.0); // f(x) = (3x^2 - x + 5) / (x^2 - 9)
-        fracFunc.DisplayCoefficients();
-        Console.WriteLine();
-
-        // --- Обчислення значень в точці ---
-        Console.Write("Введіть точку x0 для обчислення значень функцій: ");
-        string input = Console.ReadLine();
-        if (double.TryParse(input, out double x0))
+        Console.Write("Введіть кількість чотирикутників n: ");
+        if (!int.TryParse(Console.ReadLine(), out var n) || n <= 0)
         {
-            // Обчислення для першої функції
-            Console.WriteLine($"\nЗначення дробово-лінійної функції в точці {x0}:");
-            double result1 = linearFunc.CalculateValue(x0);
-            if (!double.IsNaN(result1))
+            Console.WriteLine("Некоректне значення n. Потрібно додатне ціле число.");
+            return;
+        }
+
+        var quadrilaterals = new List<ConvexQuadrilateral>();
+
+        for (var i = 0; i < n; i++)
+        {
+            Console.WriteLine($"\nЧотирикутник #{i + 1} - введіть координати 4 вершин в порядку обходу (по одній парі в рядку):");
+            Console.WriteLine("Формат: x y (натисніть Enter після кожної пари). Для скасування введіть слово 'skip'");
+
+            var points = new List<Point>();
+            while (points.Count < 4)
             {
-                Console.WriteLine($"f({x0}) = {result1}");
+                Console.Write($"Введіть вершину #{points.Count + 1}: ");
+                var line = Console.ReadLine();
+                if (string.Equals(line, "skip", StringComparison.OrdinalIgnoreCase))
+                {
+                    break;
+                }
+
+                var parts = (line ?? string.Empty).Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length != 2 || !double.TryParse(parts[0], out var x) || !double.TryParse(parts[1], out var y))
+                {
+                    Console.WriteLine("Некоректний ввід. Будь ласка, введіть два числа через пробіл.");
+                    continue;
+                }
+
+                points.Add(new Point(x, y));
             }
 
-            // Обчислення для другої функції
-            Console.WriteLine($"\nЗначення дробової функції в точці {x0}:");
-            double result2 = fracFunc.CalculateValue(x0);
-            if (!double.IsNaN(result2))
+            if (points.Count != 4)
             {
-                Console.WriteLine($"f({x0}) = {result2}");
+                Console.WriteLine("Чотирикутник пропущено (не введено 4 вершини).\n");
+                continue;
+            }
+
+            try
+            {
+                var quad = new ConvexQuadrilateral(points[0], points[1], points[2], points[3]);
+                quadrilaterals.Add(quad);
+                Console.WriteLine("Чотирикутник успішно додано.");
+            }
+            catch (ArgumentException ex)
+            {
+                Console.WriteLine($"Не вдалося створити опуклий чотирикутник: {ex.Message}");
+                Console.WriteLine("Чотирикутник пропущено.\n");
             }
         }
-        else
+
+        if (quadrilaterals.Count == 0)
         {
-            Console.WriteLine("Некоректне введення. Будь ласка, введіть число.");
+            Console.WriteLine("Не створено жодного опуклого чотирикутника.");
+            return;
         }
+
+        var maxPerimeterQuad = quadrilaterals.OrderByDescending(q => q.Perimeter).First();
+
+        Console.WriteLine("\nЧотирикутник з найбільшим периметром:");
+        Console.WriteLine(maxPerimeterQuad);
     }
 }
